@@ -8,8 +8,10 @@ Gem::Specification.new do |spec|
   spec.version       = DatatablesServer::VERSION
   spec.authors       = ["Diego Mónaco"]
   spec.email         = ["dfmonaco@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Server-side processing for DataTables in Ruby}
+  spec.description   = %q{DatatablesServer will receive a number of variables from a Datatables client and
+  it will perform all the required processing (i.e. when paging, sorting, filtering etc),
+  and then return the data in the format required by DataTables}
   spec.homepage      = ""
   spec.license       = "MIT"
 
