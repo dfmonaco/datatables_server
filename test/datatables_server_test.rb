@@ -40,7 +40,7 @@ describe DatatablesServer::Base do
 
         private
         # Mock repository, we don't need a mock framework, thanks Ruby!
-        # we define repository as a collaborator and we mock the expected interface
+        # repository is a collaborator so we can mock the expected interface
         def repository
           OpenStruct.new.tap do |r|
             r.count_all = 57
