@@ -62,6 +62,5 @@ describe DatatablesServer::Base do
 
       assert_equal expected_hash, generated_hash
     end
-
   end
 end

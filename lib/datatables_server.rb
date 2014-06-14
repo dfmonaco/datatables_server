@@ -1,6 +1,6 @@
 require "datatables_server/version"
 require 'datatables_server/custom_errors'
-require 'datatables_server/repository'
+require 'datatables_server/repository_factory'
 
 module DatatablesServer
   class Base
@@ -66,7 +66,7 @@ module DatatablesServer
     end
 
     def repository
-      @repository ||= DatatablesServer::Repository.create(data, columns, options)
+      @repository ||= RepositoryFactory.create(data, columns, options)
     end
 
   end
