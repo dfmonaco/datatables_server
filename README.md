@@ -1,6 +1,7 @@
 # DatatablesServer
 
-> [![Build Status](https://travis-ci.org/dfmonaco/datatables_server.svg?branch=master)](https://travis-ci.org/dfmonaco/datatables_server)
+[![Build Status](https://travis-ci.org/dfmonaco/datatables_server.svg?branch=master)](https://travis-ci.org/dfmonaco/datatables_server)
+[![Coverage Status](https://coveralls.io/repos/dfmonaco/datatables_server/badge.png)](https://coveralls.io/r/dfmonaco/datatables_server)
 
 DatatablesServer will receive a number of variables from a Datatables client and
 it will perform all the required processing (i.e. when paging, sorting, filtering etc),
