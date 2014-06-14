@@ -1,5 +1,4 @@
-require 'minitest/autorun'
-require 'datatables_server'
+require 'minitest_helper'
 require 'ostruct'
 
 describe DatatablesServer::Base do

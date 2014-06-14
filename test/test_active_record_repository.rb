@@ -1,8 +1,8 @@
-require 'minitest/autorun'
+require 'minitest_helper'
+
 require 'sqlite3'
 require 'active_record'
 require 'database_cleaner'
-require 'datatables_server'
 
 unless File.exists? 'test.db'
   SQLite3::Database.new "test.db"

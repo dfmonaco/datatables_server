@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description   = %q{DatatablesServer will receive a number of variables from a Datatables client and
   it will perform all the required processing (i.e. when paging, sorting, filtering etc),
   and then return the data in the format required by DataTables}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/dfmonaco/datatables_server"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")
