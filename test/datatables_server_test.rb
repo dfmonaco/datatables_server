@@ -1,66 +1,67 @@
 require 'minitest/autorun'
-require 'active_record'
 require 'datatables_server'
+require 'ostruct'
 
-class Project < ActiveRecord::Base
-  def self.create_column(name, default = nil, type = 'string')
-    ActiveRecord::ConnectionAdapters::Column.new(name, default, type)
-  end
+describe DatatablesServer::Base do
+  describe 'raising MethodNotImplementedError' do
+    before do
+      class Foo < DatatablesServer::Base
+      end
 
-  def self.columns
-    [create_column('name'),
-      create_column('project_manager'),
-      create_column('id'),
-      create_column('created_at'),
-      create_column('updated_at'),
-      create_column('company_id')]
-  end
-
-  belongs_to :company
-
-  def persisted?
-    true
-  end
-end
-
-class Company < ActiveRecord::Base
-  def self.create_column(name, default = nil, type = 'string')
-    ActiveRecord::ConnectionAdapters::Column.new(name, default, type)
-  end
-
-  def self.columns
-    [create_column('name'),
-      create_column('id'),
-      create_column('created_at'),
-      create_column('updated_at')]
-  end
-
-  def persisted?
-    true
-  end
-end
-
-describe DatatablesServer do
-  before do
-    class Foo < DatatablesServer::Base
+      @foo = Foo.new({})
     end
 
-    @foo = Foo.new({})
-  end
+    it 'raises an exception if #data is not implemented' do
+      assert_raises(DatatablesServer::MethodNotImplementedError) do
+        @foo.data
+      end
+    end
 
-  it 'responds to #as_json' do
-    assert @foo.respond_to? :as_json
-  end
-
-  it 'raises an exception if #data is not implemented' do
-    assert_raises(DatatablesServer::MethodNotImplementedError) do
-      @foo.data
+    it 'raises an exception if #columns is not implemented' do
+      assert_raises(DatatablesServer::MethodNotImplementedError) do
+        @foo.columns
+      end
     end
   end
 
-  it 'raises an exception if #columns is not implemented' do
-    assert_raises(DatatablesServer::MethodNotImplementedError) do
-      @foo.columns
+  describe '#as_json' do
+    before do
+      class ContactsDatatatables < DatatablesServer::Base
+        def data
+        end
+
+        def columns
+          %w(contacts.name contacts.age)
+        end
+
+        private
+        # Mock repository, we don't need a mock framework, thanks Ruby!
+        # we define repository as a collaborator and we mock the expected interface
+        def repository
+          OpenStruct.new.tap do |r|
+            r.count_all = 57
+            r.count_filtered = 32
+            r.paginated_data = [OpenStruct.new(name: 'foo', age: 21),
+                                OpenStruct.new(name: 'bar', age: 12)]
+          end
+        end
+      end
     end
+
+    it 'returns a hash with the right keys and values' do
+      params = { sEcho: '1' }
+      dt_server = ContactsDatatatables.new(params)
+      expected_hash = {
+                        sEcho: 1,
+                        iTotalRecords: 57,
+                        iTotalDisplayRecords: 32,
+                        aaData: [['foo', 21], ['bar', 12]]
+                      }
+
+      generated_hash = dt_server.as_json
+
+      assert_equal expected_hash, generated_hash
+    end
+
   end
 end
