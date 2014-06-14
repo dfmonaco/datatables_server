@@ -44,7 +44,12 @@ module DatatablesServer
     def aa_data
       repository.paginated_data.map do |datum|
         attributes.inject([]) do |array, column|
-          array << datum.public_send(column)
+          raw_value = datum.public_send(column)
+          if respond_to?(column)
+            array << public_send(column, raw_value)
+          else
+            array << raw_value
+          end
         end
       end
     end

@@ -34,6 +34,10 @@ describe DatatablesServer::Base do
           %w(contacts.name contacts.age)
         end
 
+        def name(value)
+          value.upcase
+        end
+
         private
         # Mock repository, we don't need a mock framework, thanks Ruby!
         # we define repository as a collaborator and we mock the expected interface
@@ -55,7 +59,7 @@ describe DatatablesServer::Base do
                         sEcho: 1,
                         iTotalRecords: 57,
                         iTotalDisplayRecords: 32,
-                        aaData: [['foo', 21], ['bar', 12]]
+                        aaData: [['FOO', 21], ['BAR', 12]]
                       }
 
       generated_hash = dt_server.as_json
