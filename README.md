@@ -95,7 +95,7 @@ class ProductDatatables < DatatablesServer::Base
 end
 ```
 ### Rails example
-As I said DatatablesServer does not depend on Rails, this it's just an example of a possible implementation.
+As I said DatatablesServer does not depend on Rails, this is just an example of a possible implementation.
 
 ```ruby
 # app/controllers/products_controller.rb
