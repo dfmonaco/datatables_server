@@ -66,4 +66,31 @@ describe DatatablesServer::Base do
       assert_equal expected_hash, generated_hash
     end
   end
+
+  describe '#options' do
+    it 'returns an object with the required options for the repository' do
+      class TestDatatables < DatatablesServer::Base
+        def columns
+          %w(column_1 column_2)
+        end
+      end
+
+      params = {
+          iDisplayStart: '0',
+          iDisplayLength: '4',
+          iSortCol_0: '1',
+          iSortDir_0: 'asc',
+          sSearch: 'foo'
+        }
+
+      options = TestDatatables.new(params).options
+
+      assert_equal 0, options.page_start
+      assert_equal 4, options.page_size
+      assert_equal 'column_2', options.sort_column
+      assert_equal 'ASC', options.sort_direction
+      assert_equal 'foo', options.search_term
+    end
+  end
+
 end

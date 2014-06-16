@@ -25,6 +25,16 @@ module DatatablesServer
       raise MethodNotImplementedError
     end
 
+    def options
+      OpenStruct.new.tap do |o|
+        o.page_start = params[:iDisplayStart].to_i
+        o.page_size = params[:iDisplayLength].to_i
+        o.sort_column = columns[params[:iSortCol_0].to_i]
+        o.sort_direction = (params[:sSortDir_0] == 'desc' ? 'DESC' : 'ASC')
+        o.search_term = params[:sSearch]
+      end
+    end
+
     private
 
     attr_reader :params
@@ -57,16 +67,6 @@ module DatatablesServer
     def attributes
       @attributes ||= columns.map do |column|
         column.split('.').last
-      end
-    end
-
-    def options
-      OpenStruct.new.tap do |o|
-        o.page_start = params[:iDisplayStart].to_i
-        o.page_size = params[:iDisplayLength].to_i
-        o.sort_column = columns[params[:iSortCol_0].to_i]
-        o.sort_direction = (params[:sSortDir_0] == 'desc' ? 'DESC' : 'ASC')
-        o.search_term = params[:sSearch]
       end
     end
 

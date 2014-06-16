@@ -6,8 +6,7 @@ module DatatablesServer
       case
       when defined?(ActiveRecord::Relation) && data.is_a?(ActiveRecord::Relation)
         ActiveRecordRepository.new(data, columns, options)
-      when defined?(Sequel::Model) && data.is_a?(Sequel::Model)
-        raise RepositoryNotImplementedError
+      # put here more ORM adapters
       else
         raise RepositoryNotImplementedError
       end
