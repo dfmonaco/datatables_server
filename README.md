@@ -7,6 +7,7 @@ DatatablesServer will receive a number of variables from a DataTables client and
 it will perform all the required processing (i.e. when paging, sorting, filtering etc),
 and then return the data in the format required by DataTables.
 
+**Currently only works for DataTables v1.9, support for v1.10 will be available in next version.**
 ## Installation
 
 Add this line to your application's Gemfile:
