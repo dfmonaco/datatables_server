@@ -22,8 +22,32 @@ Or install it yourself as:
     $ gem install datatables_server
 
 ## Usage
+To use DatatablesServer you just need to inherit from `DatatablesServer::Base` and implement two methods: `#data`, wich must return
+an `ActiveRecord::Relation` and `#columns` wich must return the columns used in the client table in the right order and represented
+as an array of strings in the form `'table_name.column_name'`.
 
-TODO: Write usage instructions here
+```ruby
+# person.rb
+
+class Person < ActiveRecord::Base
+end
+```
+
+```ruby
+#person_datatables
+
+class PersonDatatables < DatatablesServer::Base
+
+  def data
+    Person.all
+  end
+
+  def columns
+    %w(persons.name persons.age persons.gender)
+  end
+end
+```
+And that's it!, DatatablesServer will handle paging, ordering and filtering by returning the right JSON document to the client.
 
 ## Compatibility
 
