@@ -64,7 +64,7 @@ and do whatever you want with the data.
 
 ```ruby
 class ProductDatatables < DatatablesServer::Base
-  ....
+  # ....
 
   def name(raw_name)
     raw_name.capitalize
