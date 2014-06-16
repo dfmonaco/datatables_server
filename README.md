@@ -76,7 +76,7 @@ class ProductDatatables < DatatablesServer::Base
 end
 ```
 
-### Wroking with joins
+### Working with joins
 To work with joins you don't have to do anything special, just define the required methods as before.
 
 ```ruby
