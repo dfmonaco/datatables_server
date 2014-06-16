@@ -52,7 +52,7 @@ class ProductDatatables < DatatablesServer::Base
 end
 ```
 And that's it!, DatatablesServer will handle paging, sorting and filtering by returning the right JSON document to the client,
-you just have to instatiate it with the params sent by DataTables, and call the `#as_json` mehtod.
+you just have to instantiate it with the params sent by DataTables, and call the `#as_json` mehtod.
 
 ```ruby
 ProductDatatables.new(params).as_json # => JSON document to be consumed by the client
@@ -94,7 +94,9 @@ class ProductDatatables < DatatablesServer::Base
   end
 end
 ```
-### Full Rails example
+### Rails example
+As I said DatatablesServer does not depend on Rails, this it's just an example of a possible implementation.
+
 ```ruby
 # app/controllers/products_controller.rb
 
@@ -102,6 +104,7 @@ class ProductsController < ApplicationController
   def index
     respond_to do |format|
       format.html
+      # you can pass the view_context if you want to use helper methods
       format.json {render json: ProductDatatables.new(view_context)}
     end
   end
@@ -147,4 +150,4 @@ For any given version, check `.travis.yml` to see what Ruby versions are being t
 
 ## License
 
-__MIT License__. *Copyright 2013 Diego Mónaco*
+__MIT License__. *Copyright 2014 Diego Mónaco*
