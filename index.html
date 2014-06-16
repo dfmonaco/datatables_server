@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Datatables server by dfmonaco</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Datatables server</h1>
+        <p>Server-side processing for DataTables in Ruby</p>
+        <p class="view"><a href="https://github.com/dfmonaco/datatables_server">View the Project on GitHub <small>dfmonaco/datatables_server</small></a></p>
+        <ul>
+          <li><a href="https://github.com/dfmonaco/datatables_server/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/dfmonaco/datatables_server/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/dfmonaco/datatables_server">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="datatablesserver" class="anchor" href="#datatablesserver"><span class="octicon octicon-link"></span></a>DatatablesServer</h1>
+
+<p><a href="https://travis-ci.org/dfmonaco/datatables_server"><img src="https://travis-ci.org/dfmonaco/datatables_server.svg?branch=master" alt="Build Status"></a>
+<a href="https://coveralls.io/r/dfmonaco/datatables_server"><img src="https://coveralls.io/repos/dfmonaco/datatables_server/badge.png" alt="Coverage Status"></a></p>
+
+<p>DatatablesServer will receive a number of variables from a DataTables client and
+it will perform all the required processing (i.e. when paging, sorting, filtering etc),
+and then return the data in the format required by DataTables.</p>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>Add this line to your application's Gemfile:</p>
+
+<pre><code>gem 'datatables_server'
+</code></pre>
+
+<p>And then execute:</p>
+
+<pre><code>$ bundle
+</code></pre>
+
+<p>Or install it yourself as:</p>
+
+<pre><code>$ gem install datatables_server
+</code></pre>
+
+<h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a name="basic-usage" class="anchor" href="#basic-usage"><span class="octicon octicon-link"></span></a>Basic usage</h3>
+
+<p>To use DatatablesServer you just need to inherit from <code>DatatablesServer::Base</code> and implement two methods: <code>#data</code>, wich must return
+an <code>ActiveRecord::Relation</code> and <code>#columns</code> wich must return the columns used in the client table in the right order and represented
+as an array of strings in the form <code>'table_name.column_name'</code>.</p>
+
+<p>Datatables does NOT depend on Rails, it can be used perfectly with any framework, right now the only dependency it's ActiveRecord,
+but it's very easy to implement an adapter for other ORMs.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># product.rb</span>
+
+<span class="k">class</span> <span class="nc">Product</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="k">end</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="c1">#product_datatables</span>
+
+<span class="k">class</span> <span class="nc">ProductDatatables</span> <span class="o">&lt;</span> <span class="no">DatatablesServer</span><span class="o">::</span><span class="no">Base</span>
+
+  <span class="k">def</span> <span class="nf">data</span>
+    <span class="no">Product</span><span class="o">.</span><span class="n">all</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">columns</span>
+    <span class="sx">%w(products.name products.price products.description)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>And that's it!, DatatablesServer will handle paging, sorting and filtering by returning the right JSON document to the client,
+you just have to instantiate it with the params sent by DataTables, and call the <code>#as_json</code> mehtod.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="no">ProductDatatables</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="o">.</span><span class="n">as_json</span> <span class="c1"># =&gt; JSON document to be consumed by the client</span>
+</pre></div>
+
+<h3>
+<a name="processing-raw-data" class="anchor" href="#processing-raw-data"><span class="octicon octicon-link"></span></a>Processing raw data</h3>
+
+<p>If you want to process the raw data that's coming from the datatabase you can implement a method with the same name as the column
+and do whatever you want with the data.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">ProductDatatables</span> <span class="o">&lt;</span> <span class="no">DatatablesServer</span><span class="o">::</span><span class="no">Base</span>
+  <span class="o">.</span><span class="n">.</span><span class="o">.</span><span class="n">.</span>
+
+  <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="n">raw_name</span><span class="p">)</span>
+    <span class="n">raw_name</span><span class="o">.</span><span class="n">capitalize</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">price</span><span class="p">(</span><span class="n">raw_price</span><span class="p">)</span>
+    <span class="s2">"$ </span><span class="si">#{</span><span class="n">raw_price</span><span class="si">}</span><span class="s2">"</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="wroking-with-joins" class="anchor" href="#wroking-with-joins"><span class="octicon octicon-link"></span></a>Wroking with joins</h3>
+
+<p>To work with joins you don't have to do anything special, just define the required methods as before.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1">#product_datatables</span>
+
+<span class="k">class</span> <span class="nc">ProductDatatables</span> <span class="o">&lt;</span> <span class="no">DatatablesServer</span><span class="o">::</span><span class="no">Base</span>
+
+  <span class="c1"># Product belongs_to :supplier</span>
+  <span class="k">def</span> <span class="nf">data</span>
+    <span class="no">Product</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="s1">'products.name'</span><span class="p">,</span> <span class="s1">'suppliers.email'</span><span class="p">)</span><span class="o">.</span><span class="n">joins</span><span class="p">(</span><span class="ss">:supplier</span><span class="p">)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">columns</span>
+    <span class="sx">%w(products.name suppliers.email)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="rails-example" class="anchor" href="#rails-example"><span class="octicon octicon-link"></span></a>Rails example</h3>
+
+<p>As I said DatatablesServer does not depend on Rails, this is just an example of a possible implementation.</p>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># app/controllers/products_controller.rb</span>
+
+<span class="k">class</span> <span class="nc">ProductsController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+  <span class="k">def</span> <span class="nf">index</span>
+    <span class="n">respond_to</span> <span class="k">do</span> <span class="o">|</span><span class="nb">format</span><span class="o">|</span>
+      <span class="nb">format</span><span class="o">.</span><span class="n">html</span>
+      <span class="c1"># you can pass the view_context if you want to use helper methods</span>
+      <span class="nb">format</span><span class="o">.</span><span class="n">json</span> <span class="p">{</span><span class="n">render</span> <span class="ss">json</span><span class="p">:</span> <span class="no">ProductDatatables</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">view_context</span><span class="p">)}</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<div class="highlight highlight-ruby"><pre><span class="c1"># app/datatables/product.rb</span>
+
+<span class="k">class</span> <span class="nc">ProductDatatables</span> <span class="o">&lt;</span> <span class="no">DatatablesServer</span><span class="o">::</span><span class="no">Base</span>
+
+  <span class="kp">attr_reader</span> <span class="ss">:h</span>
+
+  <span class="k">def</span> <span class="nf">initialize</span><span class="p">(</span><span class="n">view_context</span><span class="p">)</span>
+    <span class="k">super</span><span class="p">(</span><span class="n">view_context</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+    <span class="vi">@h</span> <span class="o">=</span> <span class="n">view_context</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">data</span>
+    <span class="no">Product</span><span class="o">.</span><span class="n">in_stock</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">columns</span>
+    <span class="sx">%w(products.name products.price products.description)</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">price</span><span class="p">(</span><span class="n">raw_price</span><span class="p">)</span>
+    <span class="n">h</span><span class="o">.</span><span class="n">number_to_currency</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<h2>
+<a name="compatibility" class="anchor" href="#compatibility"><span class="octicon octicon-link"></span></a>Compatibility</h2>
+
+<p>For any given version, check <code>.travis.yml</code> to see what Ruby versions are being tested for compatibility.</p>
+
+<h2>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<ol>
+<li>Fork it ( <a href="https://github.com/%5Bmy-github-username%5D/datatables_server/fork">https://github.com/[my-github-username]/datatables_server/fork</a> )</li>
+<li>Create your feature branch (<code>git checkout -b my-new-feature</code>)</li>
+<li>Commit your changes (<code>git commit -am 'Add some feature'</code>)</li>
+<li>Push to the branch (<code>git push origin my-new-feature</code>)</li>
+<li>Create a new Pull Request</li>
+</ol><h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p><strong>MIT License</strong>. <em>Copyright 2014 Diego Mónaco</em></p>
+      </section>
+    </div>
+    <footer>
+      <p>Project maintained by <a href="https://github.com/dfmonaco">dfmonaco</a></p>
+      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
+    </footer>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
